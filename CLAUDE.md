@@ -38,6 +38,22 @@ xcodebuild test -project mosin.xcodeproj -scheme mosinUITests -destination 'plat
 - Target deployment: macOS 14.0+
 - Swift version: 5.0
 
+### Python Integration
+```bash
+# Set up Python environment for grammar correction
+python3 -m venv venv
+source venv/bin/activate
+pip install transformers torch
+
+# Test Python grammar corrector directly
+python grammar_corrector.py "This is a text with grammar errors"
+```
+
+### Dependencies
+- **Swift Package Manager**: DifferenceKit (1.3.0) for efficient diff calculations
+- **Python**: Transformers library for T5 model inference
+- **Local Models**: T5-base-grammar-correction stored in `models/` directory
+
 ## Architecture Overview
 
 ### Core Components
@@ -84,6 +100,8 @@ The app uses NotificationCenter for communication between components:
 - Models are stored in `~/Documents/MosinModels/`
 - Currently uses simulated MLX inference (real MLX integration planned)
 - Supports int4/int8 quantized models for performance
+- Temporary Python bridge via `grammar_corrector.py` for T5 model inference
+- Models prefixed with "grammar: " for T5 processing format
 
 ### Text Processing Strategy
 - Text is chunked into ~1000 character segments for efficient processing
