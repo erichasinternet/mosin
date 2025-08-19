@@ -7,11 +7,32 @@
 
 import Testing
 @testable import mosin
+import Combine
 
 struct mosinTests {
 
-    @Test func example() async throws {
-        // Write your test here and use APIs like `#expect(...)` to check expected conditions.
+    @Test func testGrammarCorrection() async throws {
+        let grammarService = GrammarService()
+        let incorrectSentence = "my dogs has went outside."
+        
+        let stream = AsyncStream<[GrammarSuggestion]> { continuation in
+            let cancellable = grammarService.$suggestions.sink {
+                continuation.yield($0)
+            }
+            continuation.onTermination = { _ in
+                cancellable.cancel()
+            }
+        }
+        
+        grammarService.checkText(incorrectSentence)
+        
+        for await suggestions in stream {
+            if !suggestions.isEmpty {
+                #expect(suggestions.count == 1)
+                #expect(suggestions.first?.suggestedText == "My dogs have gone outside.")
+                break
+            }
+        }
     }
 
 }

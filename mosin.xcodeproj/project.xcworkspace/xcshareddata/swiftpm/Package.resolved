@@ -1,0 +1,15 @@
+{
+  "originHash" : "5de9ecc9e46e55dc607917c2088bbe3b1fc4d0ac5f2487760755f3bf0c84ad9c",
+  "pins" : [
+    {
+      "identity" : "differencekit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/ra1028/DifferenceKit",
+      "state" : {
+        "revision" : "073b9671ce2b9b5b96398611427a1f929927e428",
+        "version" : "1.3.0"
+      }
+    }
+  ],
+  "version" : 3
+}

@@ -7,13 +7,34 @@
 
 import Foundation
 import AppKit
+import DifferenceKit
 
-struct GrammarSuggestion {
+struct GrammarSuggestion: Differentiable {
+    var differenceIdentifier: String {
+        return "\(range.location)-\(originalText)"
+    }
+
+    func isContentEqual(to source: GrammarSuggestion) -> Bool {
+        return range == source.range && originalText == source.originalText && suggestedText == source.suggestedText
+    }
+
     let range: NSRange
     let originalText: String
     let suggestedText: String
     let type: SuggestionType
     let confidence: Float
+}
+
+struct StringWrapper: Differentiable {
+    let value: String
+
+    var differenceIdentifier: String {
+        return value
+    }
+
+    func isContentEqual(to source: StringWrapper) -> Bool {
+        return value == source.value
+    }
 }
 
 enum SuggestionType {
@@ -55,7 +76,7 @@ class GrammarService: ObservableObject {
         debounceTimer.resume()
     }
     
-    private func checkText(_ text: String) {
+    func checkText(_ text: String) {
         DispatchQueue.main.async {
             self.isProcessing = true
         }
@@ -97,8 +118,7 @@ class MLXGrammarModel {
     private func performGrammarCheck(_ text: String) -> [GrammarSuggestion] {
         var suggestions: [GrammarSuggestion] = []
         
-        suggestions.append(contentsOf: checkSpelling(text))
-        suggestions.append(contentsOf: checkBasicGrammar(text))
+        suggestions.append(contentsOf: checkGrammarWithPython(text))
         
         return suggestions
     }
@@ -137,36 +157,40 @@ class MLXGrammarModel {
         return suggestions
     }
     
-    private func checkBasicGrammar(_ text: String) -> [GrammarSuggestion] {
-        var suggestions: [GrammarSuggestion] = []
-        
-        let patterns = [
-            ("\\bi\\b", "I", SuggestionType.grammar),
-            ("\\bits\\s+its\\b", "its", SuggestionType.grammar),
-            ("\\byour\\s+welcome\\b", "you're welcome", SuggestionType.grammar),
-            ("\\bthere\\s+is\\s+\\d+\\s+\\w+s\\b", "there are", SuggestionType.grammar)
-        ]
-        
-        for (pattern, replacement, type) in patterns {
-            do {
-                let regex = try NSRegularExpression(pattern: pattern, options: [.caseInsensitive])
-                let matches = regex.matches(in: text, options: [], range: NSRange(location: 0, length: text.count))
-                
-                for match in matches {
-                    let originalText = (text as NSString).substring(with: match.range)
-                    suggestions.append(GrammarSuggestion(
-                        range: match.range,
-                        originalText: originalText,
-                        suggestedText: replacement,
-                        type: type,
-                        confidence: 0.7
-                    ))
-                }
-            } catch {
-                print("Regex error: \(error)")
-            }
+    private func checkGrammarWithPython(_ text: String) -> [GrammarSuggestion] {
+        let task = Process()
+        task.executableURL = URL(fileURLWithPath: "/Users/eric/mosin/venv/bin/python3")
+        task.arguments = ["/Users/eric/mosin/grammar_corrector.py", text]
+
+        let pipe = Pipe()
+        task.standardOutput = pipe
+
+        do {
+            try task.run()
+            task.waitUntilExit()
+            let data = pipe.fileHandleForReading.readDataToEndOfFile()
+            let output = String(data: data, encoding: .utf8) ?? ""
+            
+            let correctedText = output.trimmingCharacters(in: .whitespacesAndNewlines)
+            return diff(original: text, corrected: correctedText)
+        } catch {
+            print("Error running python script: \(error)")
+            return []
         }
-        
-        return suggestions
+    }
+
+    private func diff(original: String, corrected: String) -> [GrammarSuggestion] {
+        print("Original: \(original)")
+        print("Corrected: \(corrected)")
+
+        if original.lowercased() == corrected.lowercased() {
+            print("No changes found.")
+            return []
+        }
+
+        let range = NSRange(location: 0, length: original.count)
+        let suggestion = GrammarSuggestion(range: range, originalText: original, suggestedText: corrected, type: .grammar, confidence: 0.9)
+        print("Suggestions: \(suggestion)")
+        return [suggestion]
     }
 }
