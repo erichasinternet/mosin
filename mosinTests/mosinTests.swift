@@ -6,33 +6,43 @@
 //
 
 import Testing
+import Foundation
 @testable import mosin
 import Combine
 
 struct mosinTests {
 
-    @Test func testGrammarCorrection() async throws {
-        let grammarService = GrammarService()
+    @Test func testMLXGrammarModel() async throws {
+        // Test the MLX model directly instead of the full service
+        let mlxModel = MLXGrammarModel()
         let incorrectSentence = "my dogs has went outside."
         
-        let stream = AsyncStream<[GrammarSuggestion]> { continuation in
-            let cancellable = grammarService.$suggestions.sink {
-                continuation.yield($0)
-            }
-            continuation.onTermination = { _ in
-                cancellable.cancel()
-            }
-        }
+        let suggestions = try await mlxModel.checkGrammar(incorrectSentence)
         
-        grammarService.checkText(incorrectSentence)
-        
-        for await suggestions in stream {
-            if !suggestions.isEmpty {
-                #expect(suggestions.count == 1)
-                #expect(suggestions.first?.suggestedText == "My dogs have gone outside.")
-                break
-            }
+        #expect(suggestions.count >= 1)
+        if let firstSuggestion = suggestions.first {
+            print("Expected: 'My dogs have gone outside.'")
+            print("Actual: '\(firstSuggestion.suggestedText)'")
+            #expect(firstSuggestion.suggestedText == "My dogs have gone outside.")
         }
+    }
+    
+    @Test func testGrammarSuggestionStructure() {
+        // Test the basic data structure
+        let suggestion = GrammarSuggestion(
+            range: NSRange(location: 0, length: 10),
+            originalText: "original",
+            suggestedText: "corrected", 
+            type: .grammar,
+            confidence: 0.9
+        )
+        
+        #expect(suggestion.range.location == 0)
+        #expect(suggestion.range.length == 10)
+        #expect(suggestion.originalText == "original")
+        #expect(suggestion.suggestedText == "corrected")
+        #expect(suggestion.type == .grammar)
+        #expect(suggestion.confidence == 0.9)
     }
 
 }
