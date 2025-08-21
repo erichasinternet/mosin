@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		07CCD3782E53FAF3008776BB /* DifferenceKit in Frameworks */ = {isa = PBXBuildFile; productRef = 07CCD3772E53FAF3008776BB /* DifferenceKit */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		07CCD34A2E53EC31008776BB /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -52,6 +56,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				07CCD3782E53FAF3008776BB /* DifferenceKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -112,6 +117,7 @@
 			);
 			name = mosin;
 			packageProductDependencies = (
+				07CCD3772E53FAF3008776BB /* DifferenceKit */,
 			);
 			productName = mosin;
 			productReference = 07CCD3392E53EC30008776BB /* mosin.app */;
@@ -195,6 +201,9 @@
 			);
 			mainGroup = 07CCD3302E53EC30008776BB;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				07CCD3762E53FAF3008776BB /* XCRemoteSwiftPackageReference "DifferenceKit" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 07CCD33A2E53EC30008776BB /* Products */;
 			projectDirPath = "";
@@ -553,6 +562,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		07CCD3762E53FAF3008776BB /* XCRemoteSwiftPackageReference "DifferenceKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/ra1028/DifferenceKit";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.3.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		07CCD3772E53FAF3008776BB /* DifferenceKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 07CCD3762E53FAF3008776BB /* XCRemoteSwiftPackageReference "DifferenceKit" */;
+			productName = DifferenceKit;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 07CCD3312E53EC30008776BB /* Project object */;
 }
