@@ -11,7 +11,7 @@ def correct_grammar(text):
     tokenizer = T5Tokenizer.from_pretrained(model_name)
     model = T5ForConditionalGeneration.from_pretrained(model_name)
 
-    prefixed_text = "grammar: " + text
+    prefixed_text = "correct grammar: " + text
     input_ids = tokenizer.encode(prefixed_text, return_tensors="pt")
 
     outputs = model.generate(input_ids, max_length=256)

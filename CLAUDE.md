@@ -101,7 +101,7 @@ The app uses NotificationCenter for communication between components:
 - Currently uses simulated MLX inference (real MLX integration planned)
 - Supports int4/int8 quantized models for performance
 - Temporary Python bridge via `grammar_corrector.py` for T5 model inference
-- Models prefixed with "grammar: " for T5 processing format
+- Models prefixed with "correct grammar: " for T5 processing format
 
 ### Text Processing Strategy
 - Text is chunked into ~1000 character segments for efficient processing
