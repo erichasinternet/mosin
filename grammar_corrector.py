@@ -7,7 +7,7 @@ def correct_grammar(text):
     if not text or not text.strip():
         return text
     
-    model_name = "/Users/eric/mosin/models/t5-base-grammar-correction"
+    model_name = "/Users/eric/mosin/models/flan-t5-grammar-p100"
     tokenizer = T5Tokenizer.from_pretrained(model_name)
     model = T5ForConditionalGeneration.from_pretrained(model_name)
 
